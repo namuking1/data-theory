@@ -1,0 +1,354 @@
+//연결 리스트의 노드 하나를 표현하는 클래스
+class Node {
+
+    // 현재 노드가 저장할 정수 값
+    int data;
+
+    // 현재 노드의 이전 노드를 가리키는 참조 변수
+    Node prev;
+
+    // 현재 노드의 다음 노드를 가리키는 참조 변수
+    Node next;
+
+    // Node 객체를 생성할 때 실행되는 생성자
+    Node(int data) {
+
+        // 전달받은 값을 현재 노드의 data에 저장
+        this.data = data;
+    }
+}
+
+// 원형 이중 연결 리스트를 구현한 클래스
+public class DoublyCircularLinkedList {
+
+    // 리스트의 첫 번째 노드를 가리키는 변수
+    Node head;
+
+    // 현재 선택된 노드를 가리키는 변수
+    Node current;
+
+    // 리스트의 맨 앞에 새로운 노드를 삽입하는 메서드
+    public void insertAtHead(int data) {
+
+        // 전달받은 data를 가진 새로운 노드 생성
+        Node newNode = new Node(data);
+
+        // 리스트가 비어 있는 경우
+        if (head == null) {
+
+            // 새로운 노드를 head로 지정
+            head = newNode;
+
+            // 노드가 하나이므로 next가 자기 자신을 가리킴
+            head.next = head;
+
+            // 노드가 하나이므로 prev도 자기 자신을 가리킴
+            head.prev = head;
+
+            // 현재 노드도 head로 지정
+            current = head;
+
+        } else {
+
+            // head의 이전 노드가 현재 마지막 노드
+            Node tail = head.prev;
+
+            // 새 노드의 다음 노드를 기존 head로 연결
+            newNode.next = head;
+
+            // 새 노드의 이전 노드를 기존 tail로 연결
+            newNode.prev = tail;
+
+            // 기존 head의 이전 노드를 새 노드로 연결
+            head.prev = newNode;
+
+            // 기존 tail의 다음 노드를 새 노드로 연결
+            tail.next = newNode;
+
+            // 새 노드를 새로운 head로 지정
+            head = newNode;
+        }
+    }
+
+    // 리스트의 맨 뒤에 새로운 노드를 삽입하는 메서드
+    public void insertAtTail(int data) {
+
+        // 전달받은 data를 가진 새로운 노드 생성
+        Node newNode = new Node(data);
+
+        // 리스트가 비어 있는 경우
+        if (head == null) {
+
+            // 새로운 노드를 head로 지정
+            head = newNode;
+
+            // 노드가 하나이므로 next가 자기 자신을 가리킴
+            head.next = head;
+
+            // 노드가 하나이므로 prev도 자기 자신을 가리킴
+            head.prev = head;
+
+            // 현재 노드도 head로 지정
+            current = head;
+
+        } else {
+
+            // head 이전 노드가 현재 마지막 노드
+            Node tail = head.prev;
+
+            // 새 노드의 이전 노드를 기존 tail로 연결
+            newNode.prev = tail;
+
+            // 새 노드의 다음 노드를 head로 연결
+            newNode.next = head;
+
+            // 기존 tail의 다음 노드를 새 노드로 연결
+            tail.next = newNode;
+
+            // head의 이전 노드를 새 노드로 연결
+            // 따라서 새 노드가 새로운 tail이 됨
+            head.prev = newNode;
+        }
+    }
+
+    // 리스트의 첫 번째 노드를 삭제하는 메서드
+    public void deleteFromHead() {
+
+        // 리스트가 비어 있으면 삭제할 것이 없으므로 종료
+        if (head == null) {
+            return;
+        }
+
+        // head의 다음 노드가 head 자신이면 노드가 하나뿐이라는 뜻
+        if (head.next == head) {
+
+            // 유일한 노드를 삭제하므로 head를 null로 변경
+            head = null;
+
+            // current도 가리킬 노드가 없으므로 null로 변경
+            current = null;
+
+            // 메서드 종료
+            return;
+        }
+
+        // 현재 마지막 노드를 저장
+        Node tail = head.prev;
+
+        // current가 삭제될 head를 가리키고 있다면
+        if (current == head) {
+
+            // current를 다음 노드로 이동
+            current = head.next;
+        }
+
+        // 기존 head의 다음 노드를 새로운 head로 지정
+        head = head.next;
+
+        // 새로운 head의 이전 노드를 tail로 연결
+        head.prev = tail;
+
+        // tail의 다음 노드를 새로운 head로 연결
+        tail.next = head;
+    }
+
+    // 리스트의 마지막 노드를 삭제하는 메서드
+    public void deleteFromTail() {
+
+        // 리스트가 비어 있으면 삭제할 것이 없으므로 종료
+        if (head == null) {
+            return;
+        }
+
+        // 노드가 하나뿐인 경우
+        if (head.next == head) {
+
+            // 유일한 노드를 삭제하므로 head를 null로 변경
+            head = null;
+
+            // current도 null로 변경
+            current = null;
+
+            // 메서드 종료
+            return;
+        }
+
+        // 현재 마지막 노드를 저장
+        Node tail = head.prev;
+
+        // current가 삭제할 tail을 가리키고 있다면
+        if (current == tail) {
+
+            // current를 head로 이동
+            current = head;
+        }
+
+        // 기존 tail의 이전 노드를 새로운 tail로 지정
+        Node newTail = tail.prev;
+
+        // 새로운 tail의 다음 노드를 head로 연결
+        newTail.next = head;
+
+        // head의 이전 노드를 새로운 tail로 연결
+        head.prev = newTail;
+    }
+
+    // current를 다음 노드로 이동시키는 메서드
+    public void moveNext() {
+
+        // current가 null이 아닐 때만 이동
+        if (current != null) {
+
+            // current를 다음 노드로 이동
+            current = current.next;
+        }
+    }
+
+    // current를 이전 노드로 이동시키는 메서드
+    public void movePrev() {
+
+        // current가 null이 아닐 때만 이동
+        if (current != null) {
+
+            // current를 이전 노드로 이동
+            current = current.prev;
+        }
+    }
+
+    // 현재 선택된 노드의 값을 출력하는 메서드
+    public void printCurrent() {
+
+        // current가 존재하는 경우
+        if (current != null) {
+
+            // current가 가리키는 노드의 data 출력
+            System.out.println("Current: " + current.data);
+
+        } else {
+
+            // current가 없으면 null 출력
+            System.out.println("Current: null");
+        }
+    }
+
+    // head부터 시작해서 정방향으로 모든 노드를 출력하는 메서드
+    public void traverseForward() {
+
+        // 리스트가 비어 있는 경우
+        if (head == null) {
+
+            // Empty 출력
+            System.out.println("Empty");
+
+            // 메서드 종료
+            return;
+        }
+
+        // 순회에 사용할 임시 변수를 head로 시작
+        Node temp = head;
+
+        // 최소 한 번은 실행해야 하므로 do-while 사용
+        do {
+
+            // 현재 노드의 데이터 출력
+            System.out.print(temp.data + " -> ");
+
+            // 다음 노드로 이동
+            temp = temp.next;
+
+            // 다시 head로 돌아오기 전까지 반복
+        } while (temp != head);
+
+        // 원형 구조임을 표시
+        System.out.println("(head)");
+    }
+
+    // tail부터 시작해서 역방향으로 모든 노드를 출력하는 메서드
+    public void traverseBackward() {
+
+        // 리스트가 비어 있는 경우
+        if (head == null) {
+
+            // Empty 출력
+            System.out.println("Empty");
+
+            // 메서드 종료
+            return;
+        }
+
+        // head의 이전 노드, 즉 tail에서 시작
+        Node temp = head.prev;
+
+        // 최소 한 번 실행
+        do {
+
+            // 현재 노드의 데이터 출력
+            System.out.print(temp.data + " <- ");
+
+            // 이전 노드로 이동
+            temp = temp.prev;
+
+            // 다시 처음 출발한 tail로 돌아오기 전까지 반복
+        } while (temp != head.prev);
+
+        // tail로 다시 돌아왔음을 표시
+        System.out.println("(tail)");
+    }
+
+    // 프로그램 실행이 시작되는 main 메서드
+    public static void main(String[] args) {
+
+        // 원형 이중 연결 리스트 객체 생성
+        DoublyCircularLinkedList dll =
+                new DoublyCircularLinkedList();
+
+        // 리스트의 맨 뒤에 34 삽입
+        dll.insertAtTail(34);
+
+        // 리스트의 맨 뒤에 59 삽입
+        dll.insertAtTail(59);
+
+        // 리스트의 맨 뒤에 21 삽입
+        dll.insertAtTail(21);
+
+        // 리스트의 맨 뒤에 53 삽입
+        dll.insertAtTail(53);
+
+        // 리스트의 맨 뒤에 42 삽입
+        dll.insertAtTail(42);
+
+        // 리스트의 맨 앞에 64 삽입
+        dll.insertAtHead(64);
+
+        // 리스트의 마지막 노드 42 삭제
+        dll.deleteFromTail();
+
+        // head부터 정방향으로 출력
+        dll.traverseForward();
+
+        // 출력 결과:
+        // 64 -> 34 -> 59 -> 21 -> 53 -> (head)
+
+        // current를 head로 지정
+        dll.current = dll.head;
+
+        // 현재 노드의 값 출력
+        dll.printCurrent();
+
+        // 출력 결과:
+        // Current: 64
+
+        // 총 8번 반복
+        for (int i = 0; i < 8; i++) {
+
+            // current를 이전 노드로 이동
+            dll.movePrev();
+        }
+
+        // 8번 이동한 후 현재 값 출력
+        dll.printCurrent();
+
+        // 출력 결과:
+        // Current: 59
+    }
+}
