@@ -1,0 +1,212 @@
+import java.util.*; 
+// java.util 안에 있는 여러 자료구조를 쓰겠다는 뜻
+// 여기서는 Queue, LinkedList를 사용하기 위해 필요함
+
+class Node {
+    // 트리에서 하나의 노드를 표현하는 클래스
+
+    int value;
+    // 노드 안에 저장할 값
+    // 예: 1, 2, 3 같은 숫자
+
+    Node left, right;
+    // 왼쪽 자식 노드와 오른쪽 자식 노드를 가리키는 변수
+    // left  = 왼쪽 자식
+    // right = 오른쪽 자식
+
+    Node(int val) {
+        // Node 객체를 만들 때 실행되는 생성자
+        // 예: new Node(1)을 하면 val에 1이 들어옴
+
+        value = val;
+        // 전달받은 값을 현재 노드의 value에 저장
+
+        left = right = null;
+        // 처음 노드를 만들 때는 아직 자식이 없으니까
+        // left와 right를 null로 초기화
+    }
+}
+
+public class BinaryTreeTraversal {
+    // 이진 트리 순회 예제를 실행하는 클래스
+
+    static void preorder(Node node) {
+        // 전위 순회 함수
+        // 순서: 현재 노드 → 왼쪽 자식 → 오른쪽 자식
+
+        if (node != null) {
+            // 현재 노드가 null이 아닐 때만 실행
+            // null이면 더 이상 내려갈 자식이 없다는 뜻
+
+            System.out.print(node.value + " ");
+            // 현재 노드의 값을 먼저 출력
+
+            preorder(node.left);
+            // 왼쪽 자식으로 이동해서 다시 preorder 실행
+
+            preorder(node.right);
+            // 오른쪽 자식으로 이동해서 다시 preorder 실행
+        }
+    }
+
+    static void inorder(Node node) {
+        // 중위 순회 함수
+        // 순서: 왼쪽 자식 → 현재 노드 → 오른쪽 자식
+
+        if (node != null) {
+            // 현재 노드가 null이 아닐 때만 실행
+
+            inorder(node.left);
+            // 왼쪽 자식부터 먼저 방문
+
+            System.out.print(node.value + " ");
+            // 왼쪽 방문이 끝나면 현재 노드 출력
+
+            inorder(node.right);
+            // 그다음 오른쪽 자식 방문
+        }
+    }
+
+    static void postorder(Node node) {
+        // 후위 순회 함수
+        // 순서: 왼쪽 자식 → 오른쪽 자식 → 현재 노드
+
+        if (node != null) {
+            // 현재 노드가 null이 아닐 때만 실행
+
+            postorder(node.left);
+            // 왼쪽 자식 먼저 방문
+
+            postorder(node.right);
+            // 오른쪽 자식 방문
+
+            System.out.print(node.value + " ");
+            // 왼쪽, 오른쪽을 다 방문한 뒤 현재 노드 출력
+        }
+    }
+
+    static void levelorder(Node node) {
+        // 레벨 순회 함수
+        // 위에서부터 한 층씩 왼쪽에서 오른쪽으로 출력
+        // 순서: 1 → 2 → 3 → 4 → 5 → 6 → 7
+
+        if (node == null) return;
+        // 시작 노드가 null이면 순회할 트리가 없으므로 바로 종료
+
+        Queue<Node> queue = new LinkedList<>();
+        // Node를 담을 수 있는 Queue 생성
+        // Queue는 먼저 들어온 노드가 먼저 나가는 구조
+        // LinkedList는 Queue 기능을 실제로 구현해주는 클래스
+
+        queue.offer(node);
+        // 시작 노드, 즉 root 노드를 큐에 넣음
+        // 처음에는 1번 노드가 들어감
+
+        while (!queue.isEmpty()) {
+            // 큐가 비어 있지 않은 동안 계속 반복
+            // 큐가 비었다는 것은 방문할 노드가 더 이상 없다는 뜻
+
+            Node current = queue.poll();
+            // 큐에서 맨 앞 노드를 하나 꺼냄
+            // 꺼낸 노드를 current에 저장
+
+            System.out.print(current.value + " ");
+            // 현재 꺼낸 노드의 값을 출력
+
+            if (current.left != null) {
+                // 현재 노드의 왼쪽 자식이 있으면
+
+                queue.offer(current.left);
+                // 왼쪽 자식을 큐에 넣음
+                // 나중에 순서가 되면 꺼내서 출력할 예정
+            }
+
+            if (current.right != null) {
+                // 현재 노드의 오른쪽 자식이 있으면
+
+                queue.offer(current.right);
+                // 오른쪽 자식을 큐에 넣음
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        // 프로그램이 실제로 시작되는 부분
+
+        Node root = new Node(1);
+        // 루트 노드 생성
+        // 트리의 맨 위 노드
+        //
+        // 현재 상태:
+        // 1
+
+        root.left = new Node(2);
+        // 루트 노드 1의 왼쪽 자식으로 2 생성
+
+        root.right = new Node(3);
+        // 루트 노드 1의 오른쪽 자식으로 3 생성
+        //
+        // 현재 상태:
+        //     1
+        //    / \
+        //   2   3
+
+        root.left.left = new Node(4);
+        // 2번 노드의 왼쪽 자식으로 4 생성
+
+        root.left.right = new Node(5);
+        // 2번 노드의 오른쪽 자식으로 5 생성
+        //
+        // 현재 상태:
+        //       1
+        //      / \
+        //     2   3
+        //    / \
+        //   4   5
+
+        root.right.left = new Node(6);
+        // 3번 노드의 왼쪽 자식으로 6 생성
+
+        root.right.right = new Node(7);
+        // 3번 노드의 오른쪽 자식으로 7 생성
+        //
+        // 최종 트리:
+        //         1
+        //       /   \
+        //      2     3
+        //     / \   / \
+        //    4   5 6   7
+
+        System.out.println("Preorder:");
+        // 전위 순회라는 글자 출력
+
+        preorder(root);
+        // 전위 순회 실행
+        // 현재 → 왼쪽 → 오른쪽
+        // 출력: 1 2 4 5 3 6 7
+
+        System.out.println("\nInorder:");
+        // 줄바꿈 후 중위 순회라는 글자 출력
+
+        inorder(root);
+        // 중위 순회 실행
+        // 왼쪽 → 현재 → 오른쪽
+        // 출력: 4 2 5 1 6 3 7
+
+        System.out.println("\nPostorder:");
+        // 줄바꿈 후 후위 순회라는 글자 출력
+
+        postorder(root);
+        // 후위 순회 실행
+        // 왼쪽 → 오른쪽 → 현재
+        // 출력: 4 5 2 6 7 3 1
+
+        System.out.println("\nLevelorder:");
+        // 줄바꿈 후 레벨 순회라는 글자 출력
+
+        levelorder(root);
+        // 레벨 순회 실행
+        // 위층부터 왼쪽 → 오른쪽 순서
+        // 출력: 1 2 3 4 5 6 7
+    }
+}
