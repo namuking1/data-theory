@@ -1,0 +1,85 @@
+public class MyClass {
+    private int[] que;
+    private int capacity;
+    private int front;
+    private int rear;
+    private int size;
+
+    public MyClass(int capacity) {
+        this.capacity = capacity;
+        this.que = new int[capacity];
+        this.front = 0;
+        this.rear = 0;
+        this.size = 0;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    public boolean isFull() {
+        return size == capacity;
+    }
+
+    public void enqueue(int item) {
+        if (isFull()) {
+            System.out.println("Queue is full");
+            return;
+        }
+
+        que[rear] = item;
+        rear = (rear + 1) % capacity;
+        size++;
+    }
+
+    public Integer dequeue() {
+        if (isEmpty()) {
+            System.out.println("Queue is empty");
+            return null;
+        }
+
+        int item = que[front];
+        que[front] = 0;
+
+        front = (front + 1) % capacity;
+        size--;
+
+        return item;
+    }
+
+    public void display() {
+        int index = front;
+
+        for (int i = 0; i < size; i++) {
+            System.out.print(que[index] + " ");
+            index = (index + 1) % capacity; /*(0 + 1) % 5 = 1
+(1 + 1) % 5 = 2
+(2 + 1) % 5 = 3
+(3 + 1) % 5 = 4
+(4 + 1) % 5 = 0 */
+        }
+
+        System.out.println();
+    }
+
+    public static void main(String args[]) {
+        MyClass cq = new MyClass(5);
+
+        cq.enqueue(10);
+        cq.enqueue(20);
+        cq.enqueue(30);
+        cq.enqueue(40);
+        cq.enqueue(50);
+
+        cq.display();
+
+        System.out.println(cq.dequeue());
+        System.out.println(cq.dequeue());
+        System.out.println(cq.dequeue());
+
+        cq.enqueue(60);
+        cq.enqueue(70);
+
+        cq.display();
+    }
+}
