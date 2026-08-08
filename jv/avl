@@ -1,0 +1,449 @@
+// 하나의 노드를 표현하는 클래스
+class Node {
+
+    int value;          // 노드에 저장할 값
+    int height;         // 이 노드를 루트로 하는 트리의 높이
+
+    Node left, right;   // 왼쪽 자식, 오른쪽 자식
+
+
+    // 생성자
+    Node(int val) {
+
+        value = val;    // 전달받은 값을 저장
+
+        height = 1;     // 처음 만들어진 노드는 혼자 있으므로 높이 1
+
+        // left, right는 따로 값을 넣지 않으면 자동으로 null
+    }
+}
+
+
+public class AVL {
+
+
+    // =====================================
+    // 1. 노드의 높이를 가져오는 함수
+    // =====================================
+    int getHeight(Node n) {
+
+        // n이 null이면 높이가 0
+        // null이 아니면 n.height 반환
+        return (n == null) ? 0 : n.height;
+    }
+
+
+    // =====================================
+    // 2. 노드의 균형값을 계산하는 함수
+    // =====================================
+    int getBalance(Node n) {
+
+        // 노드가 없으면 균형값 0
+        // 있으면:
+        // 왼쪽 높이 - 오른쪽 높이
+        return (n == null) ? 0 :
+            getHeight(n.left) - getHeight(n.right);
+    }
+
+
+    // =====================================
+    // 3. 오른쪽 회전
+    // =====================================
+    Node rotateRight(Node y) {
+
+        // y의 왼쪽 자식을 x에 저장
+        Node x = y.left;
+
+        // x의 오른쪽 자식을 잠깐 T2에 보관
+        Node T2 = x.right;
+
+
+        // x의 오른쪽 자식으로 y를 연결
+        x.right = y;
+
+        // y의 왼쪽에는 T2를 연결
+        y.left = T2;
+
+
+        // 회전했으므로 y의 높이를 다시 계산
+        y.height = 1 + Math.max(
+            getHeight(y.left),
+            getHeight(y.right)
+        );
+
+
+        // x의 높이도 다시 계산
+        x.height = 1 + Math.max(
+            getHeight(x.left),
+            getHeight(x.right)
+        );
+
+
+        // 회전 후 새로운 루트는 x
+        return x;
+    }
+
+
+    // =====================================
+    // 4. 왼쪽 회전
+    // =====================================
+    Node rotateLeft(Node x) {
+
+        // x의 오른쪽 자식을 y에 저장
+        Node y = x.right;
+
+        // y의 왼쪽 자식을 잠깐 T2에 보관
+        Node T2 = y.left;
+
+
+        // y의 왼쪽에 x 연결
+        y.left = x;
+
+        // x의 오른쪽에 T2 연결
+        x.right = T2;
+
+
+        // 회전 후 x의 높이 다시 계산
+        x.height = 1 + Math.max(
+            getHeight(x.left),
+            getHeight(x.right)
+        );
+
+
+        // 회전 후 y의 높이 다시 계산
+        y.height = 1 + Math.max(
+            getHeight(y.left),
+            getHeight(y.right)
+        );
+
+
+        // 회전 후 새로운 루트는 y
+        return y;
+    }
+
+
+    // =====================================
+    // 5. AVL 트리에 값 삽입
+    // =====================================
+    Node insert(Node node, int val) {
+
+        // 현재 위치가 비어 있으면
+        // 새로운 노드를 만들어서 반환
+        if (node == null)
+            return new Node(val);
+
+
+        // 넣으려는 값이 현재 값보다 작으면
+        if (val < node.value)
+
+            // 왼쪽 서브트리에 삽입
+            node.left = insert(node.left, val);
+
+
+        // 넣으려는 값이 현재 값보다 크면
+        else if (val > node.value)
+
+            // 오른쪽 서브트리에 삽입
+            node.right = insert(node.right, val);
+
+
+        // 같은 값이면 중복 삽입하지 않고 그대로 반환
+        else
+            return node;
+
+
+        // 새로운 값이 들어갔으므로
+        // 현재 노드의 높이를 다시 계산
+        node.height = 1 + Math.max(
+            getHeight(node.left),
+            getHeight(node.right)
+        );
+
+
+        // 현재 노드의 균형값 계산
+        int balance = getBalance(node);
+
+
+        // =====================================
+        // LL 상태
+        // =====================================
+
+        // 왼쪽이 너무 높고
+        // 새 값도 왼쪽 자식보다 작으면
+        if (balance > 1 && val < node.left.value)
+
+            // 오른쪽 회전
+            return rotateRight(node);
+
+
+        // =====================================
+        // RR 상태
+        // =====================================
+
+        // 오른쪽이 너무 높고
+        // 새 값도 오른쪽 자식보다 크면
+        if (balance < -1 && val > node.right.value)
+
+            // 왼쪽 회전
+            return rotateLeft(node);
+
+
+        // =====================================
+        // LR 상태
+        // =====================================
+
+        // 왼쪽이 너무 높은데
+        // 새 값이 왼쪽 자식보다 크면
+        if (balance > 1 && val > node.left.value) {
+
+            // 먼저 왼쪽 자식을 왼쪽 회전
+            node.left = rotateLeft(node.left);
+
+            // 그 다음 현재 노드를 오른쪽 회전
+            return rotateRight(node);
+        }
+
+
+        // =====================================
+        // RL 상태
+        // =====================================
+
+        // 오른쪽이 너무 높은데
+        // 새 값이 오른쪽 자식보다 작으면
+        if (balance < -1 && val < node.right.value) {
+
+            // 먼저 오른쪽 자식을 오른쪽 회전
+            node.right = rotateRight(node.right);
+
+            // 그 다음 현재 노드를 왼쪽 회전
+            return rotateLeft(node);
+        }
+
+
+        // 균형 문제가 없다면 현재 노드 반환
+        return node;
+    }
+
+
+    // =====================================
+    // 6. 가장 작은 값을 가진 노드 찾기
+    // =====================================
+    Node minValue(Node node) {
+
+        // BST에서는 작은 값이 계속 왼쪽에 있음
+        while (node.left != null)
+
+            // 계속 왼쪽으로 이동
+            node = node.left;
+
+
+        // 가장 왼쪽 노드 반환
+        return node;
+    }
+
+
+    // =====================================
+    // 7. 노드 삭제
+    // =====================================
+    Node delete(Node node, int val) {
+
+        // 현재 노드가 없으면
+        // 삭제할 값이 없는 것이므로 종료
+        if (node == null)
+            return node;
+
+
+        // 삭제하려는 값이 현재 값보다 작으면
+        if (val < node.value)
+
+            // 왼쪽에서 삭제
+            node.left = delete(node.left, val);
+
+
+        // 삭제하려는 값이 현재 값보다 크면
+        else if (val > node.value)
+
+            // 오른쪽에서 삭제
+            node.right = delete(node.right, val);
+
+
+        // val == node.value
+        // 즉, 삭제할 노드를 찾은 경우
+        else {
+
+
+            // =====================================
+            // 경우 1: 왼쪽 자식이 없음
+            // =====================================
+            if (node.left == null)
+
+                // 오른쪽 자식을 대신 반환
+                return node.right;
+
+
+            // =====================================
+            // 경우 2: 오른쪽 자식이 없음
+            // =====================================
+            else if (node.right == null)
+
+                // 왼쪽 자식을 대신 반환
+                return node.left;
+
+
+            // =====================================
+            // 경우 3: 자식이 둘 다 있음
+            // =====================================
+
+            // 오른쪽 서브트리에서
+            // 가장 작은 값을 가진 노드를 찾음
+            Node temp = minValue(node.right);
+
+
+            // 삭제하려는 노드의 값을
+            // temp의 값으로 바꿈
+            node.value = temp.value;
+
+
+            // temp의 원래 위치에 있는 노드를 삭제
+            node.right = delete(
+                node.right,
+                temp.value
+            );
+        }
+
+
+        // 삭제 후 현재 노드의 높이를 다시 계산
+        node.height = 1 + Math.max(
+            getHeight(node.left),
+            getHeight(node.right)
+        );
+
+
+        // 삭제 후 균형값 계산
+        int balance = getBalance(node);
+
+
+        // =====================================
+        // 삭제 후 왼쪽으로 너무 기울어진 경우
+        // =====================================
+        if (balance > 1) {
+
+
+            // 왼쪽 자식도 왼쪽이 높거나 균형이면
+            // LL 상태
+            if (getBalance(node.left) >= 0)
+
+                // 오른쪽 회전
+                return rotateRight(node);
+
+
+            // 여기까지 왔다면 LR 상태
+
+            // 왼쪽 자식을 왼쪽 회전
+            node.left = rotateLeft(node.left);
+
+            // 현재 노드를 오른쪽 회전
+            return rotateRight(node);
+        }
+
+
+        // =====================================
+        // 삭제 후 오른쪽으로 너무 기울어진 경우
+        // =====================================
+        if (balance < -1) {
+
+
+            // 오른쪽 자식도 오른쪽이 높거나 균형이면
+            // RR 상태
+            if (getBalance(node.right) <= 0)
+
+                // 왼쪽 회전
+                return rotateLeft(node);
+
+
+            // 여기까지 왔다면 RL 상태
+
+            // 오른쪽 자식을 오른쪽 회전
+            node.right = rotateRight(node.right);
+
+            // 현재 노드를 왼쪽 회전
+            return rotateLeft(node);
+        }
+
+
+        // 균형 문제가 없다면 현재 노드 반환
+        return node;
+    }
+
+
+    // =====================================
+    // 8. 중위 순회
+    // =====================================
+    void inorder(Node node) {
+
+        // 현재 노드가 존재하면
+        if (node != null) {
+
+            // 왼쪽부터 방문
+            inorder(node.left);
+
+            // 현재 값 출력
+            System.out.print(node.value + " ");
+
+            // 오른쪽 방문
+            inorder(node.right);
+        }
+    }
+
+
+    // =====================================
+    // 9. 프로그램 시작
+    // =====================================
+    public static void main(String[] args) {
+
+        // AVL 객체 생성
+        AVL tree = new AVL();
+
+
+        // 처음에는 트리가 비어 있음
+        Node root = null;
+
+
+        // 삽입할 값들
+        int[] vals = {
+            30, 20, 40, 10, 25, 50, 5
+        };
+
+
+        // 배열의 값을 하나씩 꺼내서
+        for (int v : vals)
+
+            // AVL 트리에 삽입
+            root = tree.insert(root, v);
+
+
+        // 삽입 후 출력
+        System.out.println("Inorder after insert:");
+
+        tree.inorder(root);
+
+        // 결과
+        // 5 10 20 25 30 40 50
+
+
+        // 40 삭제
+        root = tree.delete(root, 40);
+
+
+        // 삭제 후 출력
+        System.out.println(
+            "\nInorder after delete 40:"
+        );
+
+
+        tree.inorder(root);
+
+        // 결과
+        // 5 10 20 25 30 50
+    }
+}
