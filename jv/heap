@@ -1,0 +1,256 @@
+import java.util.ArrayList; // ArrayList 사용
+import java.util.List;      // List 사용
+
+public class MinHeap {
+
+    // 힙의 값을 저장하는 리스트
+    private List<Integer> heap;
+
+
+    // 생성자
+    public MinHeap() {
+
+        // 빈 ArrayList 생성
+        heap = new ArrayList<>();
+    }
+
+
+    // =====================================
+    // 아래에 들어간 값을 위로 올리는 함수
+    // =====================================
+    private void heapifyUp(int index) {
+
+        // 현재 노드의 부모 인덱스 계산
+        int parent = (index - 1) / 2;
+
+
+        // index > 0
+        // → 현재 노드가 root가 아닌지 확인
+        //
+        // heap.get(index) < heap.get(parent)
+        // → 현재 값이 부모 값보다 작은지 확인
+        if (index > 0 &&
+            heap.get(index) < heap.get(parent)) {
+
+            // 현재 노드와 부모 노드 위치 교환
+            swap(index, parent);
+
+            // 부모 위치로 올라간 뒤
+            // 또 위쪽 부모와 비교
+            heapifyUp(parent);
+        }
+    }
+
+
+    // =====================================
+    // 두 값의 위치를 바꾸는 함수
+    // =====================================
+    private void swap(int i, int j) {
+
+        // i번째 값을 잠시 저장
+        int tmp = heap.get(i);
+
+        // i번째 위치에 j번째 값 넣기
+        heap.set(i, heap.get(j));
+
+        // j번째 위치에 원래 i 값을 넣기
+        heap.set(j, tmp);
+    }
+
+
+    // =====================================
+    // 위에 있는 값을 아래로 내리는 함수
+    // =====================================
+    private void heapifyDown(int index) {
+
+        // 일단 현재 위치가 가장 작다고 가정
+        int smallest = index;
+
+
+        // 현재 노드의 왼쪽 자식 인덱스
+        int left = 2 * index + 1;
+
+
+        // 현재 노드의 오른쪽 자식 인덱스
+        int right = 2 * index + 2;
+
+
+        // 현재 힙에 들어있는 원소 개수
+        int size = heap.size();
+
+
+        // 왼쪽 자식이 존재하고
+        // 왼쪽 값이 현재 smallest 값보다 작다면
+        if (left < size &&
+            heap.get(left) < heap.get(smallest)) {
+
+            // 왼쪽 자식을 가장 작은 값으로 지정
+            smallest = left;
+        }
+
+
+        // 오른쪽 자식이 존재하고
+        // 오른쪽 값이 현재 smallest 값보다 작다면
+        if (right < size &&
+            heap.get(right) < heap.get(smallest)) {
+
+            // 오른쪽 자식을 가장 작은 값으로 지정
+            smallest = right;
+        }
+
+
+        // 현재 노드보다 작은 자식이 있었다면
+        if (smallest != index) {
+
+            // 현재 노드와 가장 작은 자식을 교환
+            swap(index, smallest);
+
+            // 내려간 위치에서 다시 검사
+            heapifyDown(smallest);
+        }
+    }
+
+
+    // =====================================
+    // 일반 리스트를 Min Heap으로 만드는 함수
+    // =====================================
+    public void buildHeap(List<Integer> arr) {
+
+        // 전달받은 리스트를 복사해서 heap에 저장
+        heap = new ArrayList<>(arr);
+
+
+        // 마지막 부모 노드부터 root까지 거꾸로 검사
+        //
+        // heap.size() / 2 - 1
+        // → 마지막 부모 노드의 index
+        for (int i = (heap.size() / 2) - 1;
+             i >= 0;
+             i--) {
+
+            // 현재 노드를 아래로 내려가며
+            // Min Heap 규칙 맞추기
+            heapifyDown(i);
+        }
+    }
+
+
+    // =====================================
+    // 새로운 값 삽입
+    // =====================================
+    public void insert(int val) {
+
+        // 새로운 값을 리스트 맨 마지막에 추가
+        heap.add(val);
+
+
+        // 방금 추가한 값의 index에서 시작해서
+        // 부모보다 작으면 위로 올림
+        heapifyUp(heap.size() - 1);
+    }
+
+
+    // =====================================
+    // 최소값 삭제
+    // =====================================
+    public Integer removeMin() {
+
+        // 힙이 비어 있으면 삭제할 값이 없음
+        if (heap.isEmpty())
+            return null;
+
+
+        // Min Heap의 최소값은 항상 index 0
+        int min = heap.get(0);
+
+
+        // 맨 마지막 값을 삭제하면서 가져옴
+        int last = heap.remove(heap.size() - 1);
+
+
+        // 아직 힙에 값이 남아 있다면
+        if (!heap.isEmpty()) {
+
+            // 마지막 값을 root 위치에 넣음
+            heap.set(0, last);
+
+
+            // root부터 아래로 내려가며
+            // Min Heap 규칙 다시 맞추기
+            heapifyDown(0);
+        }
+
+
+        // 원래 최소값 반환
+        return min;
+    }
+
+
+    // =====================================
+    // 최소값 확인
+    // =====================================
+    public Integer getMin() {
+
+        // 힙이 비어 있다면 null
+        if (heap.isEmpty())
+            return null;
+
+
+        // Min Heap에서 최소값은 항상 0번 위치
+        return heap.get(0);
+    }
+
+
+    // =====================================
+    // main
+    // =====================================
+    public static void main(String[] args) {
+
+        // 빈 MinHeap 객체 생성
+        MinHeap heap = new MinHeap();
+
+
+        // 일반 리스트 생성
+        List<Integer> arr =
+            List.of(5, 3, 8, 4, 1, 2);
+
+
+        // 일반 리스트를 Min Heap으로 변경
+        heap.buildHeap(arr);
+
+
+        // 출력
+        System.out.println(heap.heap);
+
+        // 결과 예시:
+        // [1, 3, 2, 4, 5, 8]
+
+
+        // 6 삽입
+        heap.insert(6);
+
+
+        System.out.println(heap.heap);
+
+        // [1, 3, 2, 4, 5, 8, 6]
+
+
+        // 최소값 확인
+        // 삭제는 안 함
+        System.out.println(heap.getMin());
+
+        // 1
+
+
+        // 최소값 삭제하면서 반환
+        System.out.println(heap.removeMin());
+
+        // 1
+
+
+        // 삭제 후 힙 확인
+        System.out.println(heap.heap);
+
+        // [2, 3, 6, 4, 5, 8]
+    }
+}
